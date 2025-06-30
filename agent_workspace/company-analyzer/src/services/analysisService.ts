@@ -1,7 +1,9 @@
 import { AnalysisResult } from '../types/analysis';
 
 class AnalysisService {
-  private baseUrl = process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:5001/api';
+  //private baseUrl = process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:5001/api';
+
+  private baseUrl = 'http://localhost:5001/api';
 
   async analyzeCompany(companyName: string): Promise<AnalysisResult> {
     try {
