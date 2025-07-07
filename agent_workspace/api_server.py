@@ -45,6 +45,7 @@ def analyze_company():
             }), 400
         
         company_name = data['company_name'].strip()
+        company_name = company_name.lower().capitalize()
         
         if not company_name:
             return jsonify({
@@ -133,9 +134,10 @@ if __name__ == '__main__':
     print("Starting Company Analysis API Server...")
     print("Server will be available at: http://localhost:5001")
     print("API endpoints:")
-    print("  GET  /api/health - Health check")
+    print("  GET  /api/health - Health check!")
     print("  POST /api/analyze - Analyze company")
     print("  POST /api/update_field - Update analysis field")
     print("  POST /api/export - Export analysis report")
     
     app.run(debug=True, host='0.0.0.0', port=5001)
+    # app.run(host='0.0.0.0', port=5001)

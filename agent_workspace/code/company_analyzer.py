@@ -13,113 +13,112 @@ from googlesearch import search
 from bs4 import BeautifulSoup
 from website_extractor import WebsiteExtractor
 from gemini_wrapper import get_gemini_response
+from db_handler import DatabaseHandler
 
 class CompanyAnalyzer:
     def __init__(self):
-        self.session = None
-        self.extractor = WebsiteExtractor()
-        
-    async def analyze_company(self, company_name: str) -> Dict[str, Any]:
-        """
-        Comprehensive company analysis
-        """
-        print(f"Starting analysis for: {company_name}")
-        
-        # Initialize analysis result structure
-        analysis_result = {
-            "company_name": company_name,
-            "company_info": {
-                "Company Group / Parent (if any)": "待补充 🔘",
-                "Company Website": "待补充 🔘", 
-                "LinkedIn Company Page": "待补充 🔘",
-                "Location (HQ)": "待补充 🔘",
-                "Location (Job Site)": "待补充 🔘",
-                "Market Region": "待补充 🔘",
-                "Industry": "待补充 🔘",
-                "Sub-Industry": "待补充 🔘",
-                "Company Stage": "待补充 🔘",
-                "Company Size (Global Headcount)": "待补充 🔘",
-                "Funding Stage (if startup)": "待补充 🔘",
-                "Listed / Private / PE-Owned": "待补充 🔘",
-                "Group Structure Notes": "待补充 🔘"
-            },
-            "products_services": {
-                "Key Products / Services": "待补充 🔘",
-                "Product / Service Differentiation": "待补充 🔘",
-                "Target Customers": "待补充 🔘",
-                "Technology Focus": "待补充 🔘",
-                "Main Revenue Source": "待补充 🔘",
-                "GTM Strategy": "待补充 🔘"
-            },
-            "market_comparison": {
-                "技术能力": {
-                    "行业常规标准": "待补充 🔘",
-                    "target_company": "待补充 🔘",
-                    "competitor_a": "待补充 🔘",
-                    "competitor_b": "待补充 🔘"
-                },
-                "产品定价": {
-                    "行业常规标准": "待补充 🔘",
-                    "target_company": "待补充 🔘",
-                    "competitor_a": "待补充 🔘",
-                    "competitor_b": "待补充 🔘"
-                },
-                "客户群体": {
-                    "行业常规标准": "待补充 🔘",
-                    "target_company": "待补充 🔘",
-                    "competitor_a": "待补充 🔘",
-                    "competitor_b": "待补充 🔘"
-                },
-                "市场份额": {
-                    "行业常规标准": "待补充 🔘",
-                    "target_company": "待补充 🔘",
-                    "competitor_a": "待补充 🔘",
-                    "competitor_b": "待补充 🔘"
-                },
-                "售后服务": {
-                    "行业常规标准": "待补充 🔘",
-                    "target_company": "待补充 🔘",
-                    "competitor_a": "待补充 🔘",
-                    "competitor_b": "待补充 🔘"
-                },
-                "渠道策略": {
-                    "行业常规标准": "待补充 🔘",
-                    "target_company": "待补充 🔘",
-                    "competitor_a": "待补充 🔘",
-                    "competitor_b": "待补充 🔘"
-                },
-                "数据安全 / 合规": {
-                    "行业常规标准": "待补充 🔘",
-                    "target_company": "待补充 🔘",
-                    "competitor_a": "待补充 🔘",
-                    "competitor_b": "待补充 🔘"
-                }
-            },
-            "research_sources": [],
-            "analysis_timestamp": "2025-06-27 15:25:08"
-        }
-        
-        try:
-            # Perform comprehensive research
-            research_data = await self.perform_research(company_name)
-            
-            # Process and populate analysis result
-            if research_data:
-                analysis_result = await self.process_research_data(research_data, analysis_result)
-                
-        except Exception as e:
-            print(f"Error during analysis: {str(e)}")
-            
-        # Add research sources
-        analysis_result["research_sources"] = [
-            "Web search results",
-            "Company official sources",
-            "Financial databases",
-            "Industry reports"
-        ]
+        self.website_extractor = WebsiteExtractor()
 
-        return analysis_result
-    
+    async def analyze_company(self, company_name: str) -> Dict[str, Any]:
+        try:
+            # Check database first
+            db_handler = DatabaseHandler()
+            cached_data = db_handler.get_research_data(company_name)
+            analysis_result = {
+                "company_name": company_name,
+                "company_info": {
+                    "Company Group / Parent (if any)": "待补充 🔘",
+                    "Company Website": "待补充 🔘", 
+                    "LinkedIn Company Page": "待补充 🔘",
+                    "Location (HQ)": "待补充 🔘",
+                    "Location (Job Site)": "待补充 🔘",
+                    "Market Region": "待补充 🔘",
+                    "Industry": "待补充 🔘",
+                    "Sub-Industry": "待补充 🔘",
+                    "Company Stage": "待补充 🔘",
+                    "Company Size (Global Headcount)": "待补充 🔘",
+                    "Funding Stage (if startup)": "待补充 🔘",
+                    "Listed / Private / PE-Owned": "待补充 🔘",
+                    "Group Structure Notes": "待补充 🔘"
+                },
+                "products_services": {
+                    "Key Products / Services": "待补充 🔘",
+                    "Product / Service Differentiation": "待补充 🔘",
+                    "Target Customers": "待补充 🔘",
+                    "Technology Focus": "待补充 🔘",
+                    "Main Revenue Source": "待补充 🔘",
+                    "GTM Strategy": "待补充 🔘"
+                },
+                "market_comparison": {
+                    "技术能力": {
+                        "行业常规标准": "待补充 🔘",
+                        "target_company": "待补充 🔘",
+                        "competitor_a": "待补充 🔘",
+                        "competitor_b": "待补充 🔘"
+                    },
+                    "产品定价": {
+                        "行业常规标准": "待补充 🔘",
+                        "target_company": "待补充 🔘",
+                        "competitor_a": "待补充 🔘",
+                        "competitor_b": "待补充 🔘"
+                    },
+                    "客户群体": {
+                        "行业常规标准": "待补充 🔘",
+                        "target_company": "待补充 🔘",
+                        "competitor_a": "待补充 🔘",
+                        "competitor_b": "待补充 🔘"
+                    },
+                    "市场份额": {
+                        "行业常规标准": "待补充 🔘",
+                        "target_company": "待补充 🔘",
+                        "competitor_a": "待补充 🔘",
+                        "competitor_b": "待补充 🔘"
+                    },
+                    "售后服务": {
+                        "行业常规标准": "待补充 🔘",
+                        "target_company": "待补充 🔘",
+                        "competitor_a": "待补充 🔘",
+                        "competitor_b": "待补充 🔘"
+                    },
+                    "渠道策略": {
+                        "行业常规标准": "待补充 🔘",
+                        "target_company": "待补充 🔘",
+                        "competitor_a": "待补充 🔘",
+                        "competitor_b": "待补充 🔘"
+                    },
+                    "数据安全 / 合规": {
+                        "行业常规标准": "待补充 🔘",
+                        "target_company": "待补充 🔘",
+                        "competitor_a": "待补充 🔘",
+                        "competitor_b": "待补充 🔘"
+                    }
+                },
+                "research_sources": [],
+                "analysis_timestamp": "2025-06-27 15:25:08"
+            }
+            if cached_data:
+                print(f"Found cached data for {company_name}")
+                db_handler.close()
+                analysis_result = await self.process_research_data(cached_data, analysis_result) 
+                return analysis_result
+            else:
+            
+                # If not in database, perform research
+                research_data = await self.perform_research(company_name)
+                
+                # Store the new research data
+                stored = db_handler.store_research_data(company_name, research_data)
+                if not stored:
+                    print(f"Failed to store research data for {company_name} in database")
+                
+                db_handler.close()
+                analysis_result = await self.process_research_data(research_data, analysis_result)  
+                return analysis_result
+            
+        except Exception as e:
+            print(f"Analysis error: {str(e)}")
+            return {}
+
     async def perform_research(self, company_name: str) -> Dict[str, Any]:
         """
         Perform multi-source research on the company
@@ -128,27 +127,64 @@ class CompanyAnalyzer:
         
         try:
             # Web search for basic company information
-            basic_info = await self.search_basic_company_info(company_name)
+            # Get basic company information
+            try:
+                basic_info = await self.search_basic_company_info(company_name)
+            except Exception as e:
+                print(f"Error getting basic info: {str(e)}")
+                basic_info = {}
             
             # Search for financial and business information  
-            financial_info = await self.search_financial_info(company_name)
-            #financial_info = {}
+            try:
+                financial_info = await self.search_financial_info(company_name)
+            except Exception as e:
+                print(f"Error getting financial info: {str(e)}")
+                financial_info = {}
             
-            product_service_info = await self.search_product_service_info(company_name)
+            # Get product and service information
+            try:
+                product_service_info = await self.search_product_service_info(company_name)
+            except Exception as e:
+                print(f"Error getting product/service info: {str(e)}")
+                product_service_info = {}
             
-            # Search for industry and competitive information
-            #industry_info = await self.search_industry_info(company_name)
-            industry_info = {}
+            # Search for industry information
+            try:
+                industry_info = await self.search_industry_info(company_name)
+            except Exception as e:
+                print(f"Error getting industry info: {str(e)}")
+                industry_info = {}
+            
+            # Get industry company information
+            try:
+                industry_company_info = await self.search_industry_company_info(company_name)
+            except Exception as e:
+                print(f"Error getting industry company info: {str(e)}")
+                industry_company_info = {}
+            
+            # Get competitor information
+            try:
+                competitor_company_info = await self.search_competitor_company_info(company_name)
+            except Exception as e:
+                print(f"Error getting competitor info: {str(e)}")
+                competitor_company_info = {}
             
             # Combine all research data
             research_data = {
                 "basic_info": basic_info,
                 "financial_info": financial_info, 
                 "industry_info": industry_info,
-                "product_service_info": product_service_info
+                "product_service_info": product_service_info,
+                "industry_company_info": industry_company_info,
+                "competitor_company_info": competitor_company_info
             }
 
-            print(research_data)
+            # Store research data in database
+            db_handler = DatabaseHandler()
+            stored = db_handler.store_research_data(company_name, research_data)
+            if not stored:
+                print(f"Failed to store research data for {company_name} in database")
+            db_handler.close()
             
             return research_data
             
@@ -168,8 +204,9 @@ class CompanyAnalyzer:
         - LinkedIn page
         - Parent company (if any)
         - Description
+        - Market region
 
-        Respond only in the following JSON format:
+        Respond only in the following JSON format, without any extra text:
         {{
         "company_name": "",
         "website": "",
@@ -177,11 +214,12 @@ class CompanyAnalyzer:
         "industry": "",
         "linkedin_page": "",
         "parent_company": "",
-        "description": ""
+        "description": "",
+        "market_region": ""
         }}
         """
         response = get_gemini_response(query)
-        #print(response)
+        print("basic info:" + response)
         return json.loads(response)
 
     async def search_financial_info(self, company_name: str) -> Dict[str, Any]:
@@ -195,7 +233,7 @@ class CompanyAnalyzer:
         - Listing Status
         - Revenue
 
-        Respond only in the following JSON format:
+        Respond only in the following JSON format, without any extra text:
         {{
         "company_size": "",
         "funding_stage": "",
@@ -218,7 +256,7 @@ class CompanyAnalyzer:
         - Main Revenue Source
         - GTM Strategy
 
-        Respond only in the following JSON format:
+        Respond only in the following JSON format, without any extra text:
         {{
         "key_products_services": "",
         "target_customers": "",
@@ -234,44 +272,104 @@ class CompanyAnalyzer:
         """
         Search for industry and competitive information
         """
-        try:
-            # Search for key products and services
-            query_products = f"{company_name} key products and services"
-            search_results_products = list(search(query_products, num_results=1))
-            products_services = search_results_products[0] if search_results_products else None
+        query = f"""
+        Firt I want to to know the industry that {company_name} is it.
 
-            # Search for competitors
-            query_competitors = f"top competitors of {company_name}"
-            search_results_competitors = list(search(query_competitors, num_results=2))
+        Give me the following information about the industry:
+        - pricing strategy
+        - after-sales service
+        - customer base
+        - market share
+        - competitive landscape
+        - Data Security and Compliance
+        - channel strategy
 
-            competitors_data = []
-            for competitor in search_results_competitors:
-                # Get competitor website
-                query_competitor_website = f"{competitor} official website"
-                search_results_website = list(search(query_competitor_website, num_results=1))
-                website = search_results_website[0] if search_results_website else None
+        Respond ONLY in the following JSON format, without any extra text:
+        {{
+            "pricing_strategy": "",
+            "after_sales_service": "",
+            "customer_base": "",
+            "market_share": "",
+            "competitive_landscape": "",
+            "data_security_compliance": "",
+            "channel_strategy": ""
+        }}
+        """
+        
+        response = get_gemini_response(query)
+        print("industry info:" + response)
+        return json.loads(response)
 
-                # Get competitor technology
-                query_competitor_tech = f"{competitor} technology stack"
-                search_results_tech = list(search(query_competitor_tech, num_results=1))
-                technology = search_results_tech[0] if search_results_tech else None
+    async def search_industry_company_info(self, company_name: str) -> Dict[str, Any]:
+        """
+        Search for industry and competitive information
+        """
+        query = f"""
+        Give me the following information about the {company_name}:
+        - pricing strategy
+        - after-sales service
+        - customer base
+        - market share
+        - competitive landscape
+        - Data Security and Compliance
+        - channel strategy
 
-                # Get competitor pricing
-                query_competitor_pricing = f"{competitor} pricing"
-                search_results_pricing = list(search(query_competitor_pricing, num_results=1))
-                pricing = search_results_pricing[0] if search_results_pricing else None
+        Respond only in the following JSON format, without any extra text:
+        {{
+            "pricing_strategy": "",
+            "after_sales_service": "",
+            "customer_base": "",
+            "market_share": "",
+            "competitive_landscape": "",
+            "data_security_compliance": "",
+            "channel_strategy": ""
+        }}
+        """
+        response = get_gemini_response(query)
+        return json.loads(response)
+        
+    async def search_competitor_company_info(self, company_name: str) -> Dict[str, Any]:
+        """
+        Search for industry and competitive information
+        """
 
-                competitors_data.append({"name": competitor, "website": website, "technology": technology, "pricing": pricing})
+        query = f"""
+        Give me two competitors of {company_name}
 
-            return {
-                "industry_analysis": None,
-                "competitors": competitors_data,
-                "market_position": None,
-                "products_services": products_services
-            }
-        except Exception as e:
-            print(f"Industry info search error: {str(e)}")
-            return {}
+        Give the following information for the first competitor and the second competitor
+        - pricing strategy
+        - after-sales service
+        - customer base
+        - market share
+        - competitive landscape
+        - Data Security and Compliance
+        - channel strategy
+
+        Respond only in the following JSON format, without any extra text:
+        {{
+            "first competitor": {{
+            "pricing_strategy": "",
+            "after_sales_service": "",
+            "customer_base": "",
+            "market_share": "",
+            "competitive_landscape": "",
+            "data_security_compliance": "",
+            "channel_strategy": ""
+            }}, 
+            "second competitor": {{
+            "pricing_strategy": "",
+            "after_sales_service": "",
+            "customer_base": "",
+            "market_share": "",
+            "competitive_landscape": "",
+            "data_security_compliance": "",
+            "channel_strategy": ""
+            }}
+        }}
+        """
+        response = get_gemini_response(query)
+        #print(f"""""======\n{response}\n=====\n""")
+        return json.loads(response)
     
     async def process_research_data(self, research_data: Dict[str, Any], analysis_result: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -291,6 +389,8 @@ class CompanyAnalyzer:
                     analysis_result["company_info"]["Company Group / Parent (if any)"] = basic["parent_company"]
                 if basic.get("linkedin_page"):
                     analysis_result["company_info"]["LinkedIn Company Page"] = basic["linkedin_page"]
+                if basic.get("market_region"):
+                    analysis_result["company_info"]["Market Region"] = basic["market_region"]
             
             # Process financial info
             if research_data.get("financial_info"):
@@ -320,15 +420,41 @@ class CompanyAnalyzer:
             # Process industry info
             if research_data.get("industry_info"):
                 industry = research_data["industry_info"]
-                if industry.get("competitors"):
-                    competitors = industry["competitors"]
-                    if len(competitors) > 0:
-                        analysis_result["market_comparison"]["技术能力"]["competitor_a"] = competitors[0]['technology']
-                        analysis_result["market_comparison"]["产品定价"]["competitor_a"] = competitors[0]['pricing']
-                    if len(competitors) > 1:
-                        analysis_result["market_comparison"]["技术能力"]["competitor_b"] = competitors[1]['technology']
-                        analysis_result["market_comparison"]["产品定价"]["competitor_b"] = competitors[1]['pricing']
+                analysis_result["market_comparison"]["产品定价"]["行业常规标准"] = industry["pricing_strategy"]
+                analysis_result["market_comparison"]["售后服务"]["行业常规标准"] = industry["after_sales_service"]
+                analysis_result["market_comparison"]["客户群体"]["行业常规标准"] = industry["customer_base"]
+                analysis_result["market_comparison"]["市场份额"]["行业常规标准"] = industry["market_share"]
+                analysis_result["market_comparison"]["技术能力"]["行业常规标准"] = industry["competitive_landscape"]
+                analysis_result["market_comparison"]["数据安全 / 合规"]["行业常规标准"] = industry["data_security_compliance"]
+                analysis_result["market_comparison"]["渠道策略"]["行业常规标准"] = industry["channel_strategy"]
+
+                target_company = research_data["industry_company_info"] 
+                analysis_result["market_comparison"]["产品定价"]["target_company"] = target_company["pricing_strategy"]
+                analysis_result["market_comparison"]["售后服务"]["target_company"] = target_company["after_sales_service"]
+                analysis_result["market_comparison"]["客户群体"]["target_company"] = target_company["customer_base"]
+                analysis_result["market_comparison"]["市场份额"]["target_company"] = target_company["market_share"]
+                analysis_result["market_comparison"]["技术能力"]["target_company"] = target_company["competitive_landscape"]
+                analysis_result["market_comparison"]["数据安全 / 合规"]["target_company"] = target_company["data_security_compliance"]
+                analysis_result["market_comparison"]["渠道策略"]["target_company"] = target_company["channel_strategy"]
+
+                competitor1 = research_data["competitor_company_info"]["first competitor"]
+                analysis_result["market_comparison"]["产品定价"]["competitor_a"] = competitor1["pricing_strategy"]
+                analysis_result["market_comparison"]["售后服务"]["competitor_a"] = competitor1["after_sales_service"]
+                analysis_result["market_comparison"]["客户群体"]["competitor_a"] = competitor1["customer_base"]
+                analysis_result["market_comparison"]["市场份额"]["competitor_a"] = competitor1["market_share"]
+                analysis_result["market_comparison"]["技术能力"]["competitor_a"] = competitor1["competitive_landscape"]
+                analysis_result["market_comparison"]["数据安全 / 合规"]["competitor_a"] = competitor1["data_security_compliance"]
+                analysis_result["market_comparison"]["渠道策略"]["competitor_a"] = competitor1["channel_strategy"]
                 
+                competitor2 = research_data["competitor_company_info"]["second competitor"]
+                analysis_result["market_comparison"]["产品定价"]["competitor_b"] = competitor2["pricing_strategy"]
+                analysis_result["market_comparison"]["售后服务"]["competitor_b"] = competitor2["after_sales_service"]
+                analysis_result["market_comparison"]["客户群体"]["competitor_b"] = competitor2["customer_base"]
+                analysis_result["market_comparison"]["市场份额"]["competitor_b"] = competitor2["market_share"]
+                analysis_result["market_comparison"]["技术能力"]["competitor_b"] = competitor2["competitive_landscape"]
+                analysis_result["market_comparison"]["数据安全 / 合规"]["competitor_b"] = competitor2["data_security_compliance"]
+                analysis_result["market_comparison"]["渠道策略"]["competitor_b"] = competitor2["channel_strategy"]
+
             # Add research sources
             analysis_result["research_sources"] = [
                 "Web search results",
@@ -336,6 +462,8 @@ class CompanyAnalyzer:
                 "Financial databases",
                 "Industry reports"
             ]
+
+            #print(analysis_result)
 
             return analysis_result
             
