@@ -180,11 +180,11 @@ class CompanyAnalyzer:
             }
 
             # Store research data in database
-            db_handler = DatabaseHandler()
-            stored = db_handler.store_research_data(company_name, research_data)
-            if not stored:
-                print(f"Failed to store research data for {company_name} in database")
-            db_handler.close()
+            # db_handler = DatabaseHandler()
+            # stored = db_handler.store_research_data(company_name, research_data)
+            # if not stored:
+            #     print(f"Failed to store research data for {company_name} in database")
+            # db_handler.close()
             
             return research_data
             
